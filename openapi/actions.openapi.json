@@ -1,0 +1,110 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "MVP Supabase Proxy", "version": "1.0.0" },
+  "servers": [{ "url": "https://YOUR-PROXY-URL.example.com" }],
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "health",
+        "summary": "Health check",
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/api/projects": {
+      "get": {
+        "operationId": "db.list_projects",
+        "summary": "List projects",
+        "responses": {
+          "200": {
+            "description": "Array of projects",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "type": "object" } }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "db.create_project",
+        "summary": "Create project",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" }
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Created project" } }
+      }
+    },
+    "/api/kpis/targets": {
+      "post": {
+        "operationId": "db.add_kpi_target",
+        "summary": "Add KPI target",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "project_id": { "type": "string", "format": "uuid" },
+                  "type": {
+                    "type": "string",
+                    "enum": ["strategic","leading","operational","technical","outcome"]
+                  },
+                  "metric": { "type": "string" },
+                  "target_value": { "type": "number" },
+                  "due_date": { "type": "string", "format": "date" }
+                },
+                "required": ["project_id","type","metric","target_value"]
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Created KPI target" } }
+      }
+    },
+    "/api/experiments": {
+      "post": {
+        "operationId": "db.log_experiment",
+        "summary": "Log experiment result",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "project_id": { "type": "string", "format": "uuid" },
+                  "hypothesis": { "type": "string" },
+                  "method": { "type": "string" },
+                  "result_metric": { "type": "string" },
+                  "result_value": { "type": "number" },
+                  "notes": { "type": "string" }
+                },
+                "required": ["project_id","hypothesis"]
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Logged experiment" } }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer" }
+    }
+  },
+  "security": [{ "bearerAuth": [] }]
+}
